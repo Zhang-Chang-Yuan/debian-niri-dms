@@ -77,3 +77,4 @@ pkill fcitx5 && sleep 1 && fcitx5 -d &
 
 - 配合第 2 节 page_size=5，候选面板每页 5 个、单行横排，视觉冗余最小
 - 改字体可加 Font="Noto Sans 10"；恢复竖排删掉该文件即可
+- 启动器里的 fcitx5 系列条目（Fcitx 5、Fcitx 5 配置、迁移向导、输入法 im-config、键盘布局测试器）清理方法见 010-niri-dms.md §2.1
