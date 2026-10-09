@@ -58,6 +58,12 @@ update-desktop-database ~/.local/share/applications
 blender-4.2 --version
 ```
 
+- 注意：DMS 启动器（快捷键 Mod+Space）的应用列表在 shell 启动时构建，新写的 .desktop 不会自动出现，需重启 DMS 后才显示：
+
+```bash
+systemctl --user restart dms.service
+```
+
 ## 4. 升级
 
 换补丁版只需重跑第 1 节三步（下载新包 → 校验 → 删旧目录并改名）；桌面项与 /usr/local/bin 软链都指向稳定名 /opt/blender-X.Y，升级后无需改任何配置。
