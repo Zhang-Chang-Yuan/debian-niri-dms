@@ -48,23 +48,20 @@ sudo ln -sfn /opt/godot-4/Godot /usr/local/bin/godot
 
 ## 3. 启动器图标
 
-官方 zip 不含图标，图标取自仓库 icon.svg（raw.githubusercontent.com 可达，不受 github.com 封锁影响；注意只有 3.x 分支根目录还有 icon.svg，master/4.x 已 404），装进用户级 hicolor 主题，.desktop 用主题名引用：
+官方 zip 不含图标，图标取自仓库 icon.svg（raw.githubusercontent.com 可达，不受 github.com 封锁影响；注意只有 3.x 分支根目录还有 icon.svg，master/4.x 已 404），直接放进用户级 hicolor 的 scalable/apps，.desktop 用主题名引用：
 
 ```bash
 mkdir -p ~/.local/share/icons/hicolor/scalable/apps
 
 curl -fsSL -o ~/.local/share/icons/hicolor/scalable/apps/godot.svg \
   "https://raw.githubusercontent.com/godotengine/godot/3.x/icon.svg"
+```
 
-# 新建的 hicolor 主题需要索引文件才能被 Icon=godot 解析
-cat > ~/.local/share/icons/hicolor/index.theme <<'EOF'
-[Icon Theme]
-Name=Hicolor
-Directories=scalable/apps
-EOF
+- **切勿**在 ~/.local/share/icons 下创建 index.theme 或对它运行 gtk-update-icon-cache：XDG 图标查找中用户级数据目录优先于 /usr/share/icons，一个只列 scalable/apps 的 index.theme 会把系统 hicolor 的完整索引（16x16~512x512 各尺寸）整体遮蔽，导致所有固定尺寸主题图标（firefox、kitty 等）在启动器里全部变成占位图标，只剩绝对路径图标（blender）和 /usr/share/pixmaps（vscode）不受影响
+- 症状与排查：启动器大片图标失效 → 查 ~/.local/share/icons/hicolor/ 是否多出 index.theme / icon-theme.cache，删掉即恢复
+- system hicolor 的索引本就含 scalable/apps，用户级图标放进 ~/.local/share/icons/hicolor/scalable/apps 即可被解析，不需要任何索引文件
 
-command -v gtk-update-icon-cache >/dev/null && gtk-update-icon-cache -q ~/.local/share/icons/hicolor
-
+```bash
 mkdir -p ~/.local/share/applications
 
 cat > ~/.local/share/applications/org.godotengine.Godot3.desktop <<'EOF'
