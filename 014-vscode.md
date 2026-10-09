@@ -44,7 +44,7 @@ mkdir -p ~/.config/environment.d
 printf 'EDITOR=code\nVISUAL=code\n' > ~/.config/environment.d/10-editor.conf
 ```
 
-- environment.d 语法为 KEY=VALUE：无 export、无引号；systemd user 启动时读取，需重新登录（或 systemctl --user daemon-reload 后新开会话）生效
+- environment.d 语法为 KEY=VALUE：无 export、无引号；systemd user 启动时读取，systemctl --user daemon-reload 后当前会话即可见（2026-10-09 验证：show-environment 已含 EDITOR/VISUAL），新登录会话同样生效
 - 不写入 ~/.profile：niri/DMS 图形会话不 source 它，经启动器起的 GUI 应用拿不到其中的变量
 - update-alternatives 的 editor alternative 保持 nano/vi，不要指向 GUI 的 code：visudo、crontab -e、git commit 等无图形或 root 上下文会失败
 - git 需要等待编辑器关闭时单独设置：git config --global core.editor "code --wait"
