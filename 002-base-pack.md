@@ -4,11 +4,15 @@
 sudo apt install curl wget unzip 
 ```
 
-## 1. 已卸载的系统组件
+## 1. 卸载 vim（可选）
 
-### vim（vim-common + vim-tiny）
+以下只针对系统自带的 vim。Debian 不同版本/安装方式是否预装 vim 不确定，先检查，存在才卸载：
 
-启动器出现 Vim 图标且无使用场景（编辑器用 nano / VSCode，见 014-vscode.md）：
+```bash
+dpkg -l | grep -E '^.i +vim'
+```
+
+有 vim-common / vim-tiny 等输出时执行：
 
 ```bash
 sudo apt remove vim-common
