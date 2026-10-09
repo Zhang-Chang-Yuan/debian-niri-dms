@@ -10,16 +10,30 @@ sudo apt install obs-studio
 - 桌面项 com.obsproject.Studio.desktop，图标随包装入 hicolor（含 256x256/512x512 PNG），装完即出现在启动器
 - 无头验证：obs --version
 
-## 2. Wayland 录屏链路（本机可用）
+## 2. Wayland 录屏链路（关键：装对 portal 后端）
 
-录桌面/窗口走 PipeWire，链路已就位：
+OBS 靠 PipeWire + xdg-desktop-portal 录桌面/窗口。**只装 obs-studio 时 OBS 认不出屏幕**：根因是 portal 没有导出 ScreenCast 接口——xdg-desktop-portal-gtk 的能力清单里没有 ScreenCast（/usr/share/xdg-desktop-portal/portals/gtk.portal 的 Interfaces 不含它），而后端缺失的接口 portal 根本不导出。
+
+修复：安装 xdg-desktop-portal-gnome（它通过 org.gnome.Mutter.ScreenCast DBus API 实现 ScreenCast，而 niri 恰好实现了这套 API）：
 
 ```bash
-busctl --user list | grep -E 'Mutter.ScreenCast|portal.Desktop'
+sudo apt install xdg-desktop-portal-gnome
+systemctl --user restart xdg-desktop-portal.service
 ```
 
-- niri 自己注册 org.gnome.Mutter.ScreenCast（busctl 可见，screencast 由 PipeWire 完成，占 pid 为 niri）
-- xdg-desktop-portal + xdg-desktop-portal-gtk 承接转接；OBS 添加「屏幕捕获 (PipeWire)」源时弹出的选择器即来自该链路
+- niri 包自带 /usr/share/xdg-desktop-portal/niri-portals.conf（`default=gnome;gtk;` + Access/Notification 走 gtk），会话为 niri 时自动优先 gnome 后端；**不需要手写配置文件**，缺的只是这个包本身
+- 不要写 `default=gnome` 一刀切覆盖：AppChooser、Inhibit、Lockdown、Access 等接口 gtk 有而 gnome 没有，全钉 gnome 会让它们失去后端（DMS 的 Inhibit 等功能）
+
+验证（无 GUI 即可确认链路就位）：
+
+```bash
+# 1. ScreenCast 接口应出现在列表里（安装前没有）
+busctl --user introspect org.freedesktop.portal.Desktop /org/freedesktop/portal/desktop | grep -E 'ScreenCast|RemoteDesktop'
+# 2. gnome 后端应已注册
+busctl --user list | grep impl.portal
+```
+
+- OBS 添加「屏幕捕获 (PipeWire)」源时会弹出选择器（gnome 后端提供，niri 侧由 org.gnome.Mutter.ScreenCast + PipeWire 完成传输）
 - 窗口捕获同理选「窗口捕获 (PipeWire)」；录制中光标可选择显示/隐藏
 
 ## 3. 说明
