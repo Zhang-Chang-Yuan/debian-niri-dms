@@ -32,6 +32,7 @@ update-desktop-database ~/.local/share/applications
 ```
 
 - 用户目录同名文件优先于 /usr/share/applications，等价于从启动器禁用但文件仍在；删掉覆盖文件即恢复
+- 已评估但保留：qt6ct（Qt6 设置）——fcitx5 配置 GUI（fcitx5-configtool）是 Qt6 程序，其界面样式由 qt6ct 管理，属必要入口而非冗余条目
 - dms-open.desktop 是 DMS 的 x-scheme-handler 接管器，隐藏它不影响 xdg-open（默认浏览器由 xdg-mime 决定，见 014-firefox.md）
 
 ### 2.2 DMS 内置启动器插件（settings.json）
