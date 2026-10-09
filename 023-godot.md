@@ -23,6 +23,18 @@ rm -rf "Godot_v${VER}-stable_x11.64.zip" /tmp/godot-3
 - 下载体积：3.x 约 35MB、4.x 约 78MB；解压后 3.x 约 64MB、4.x 约 140MB（单体二进制）
 - 版本号到 https://github.com/godotengine/godot/releases 查最新（3.x 已收尾于 3.6.3，4.x 活跃）
 
+### 前置依赖：xwayland（Godot 3 必需）
+
+Godot 3 只有 X11 后端，必须依赖 X11 兼容层。niri 26.04 把 X11 委托给 xwayland-satellite，后者需要独立的 xwayland 包提供 /usr/bin/Xwayland。缺少时报错链：xwayland-satellite 启动即 panic（`Result::unwrap()` on `Err` NotFound, code 2）→ journalctl --user 反复出现 `xwayland-satellite exited with: exit status: 101` → Xwayland 进程不存在但 /tmp/.X11-unix/X0 有残留 socket → Godot 3 报 `ERROR: X11 Display is not available`（platform/x11/os_x11.cpp:224）打不开。
+
+```bash
+sudo apt install xwayland
+```
+
+- 装好后无需重启：X 客户端下次连接时 niri 自动拉起 satellite（pgrep -a xwayland 可见 xwayland-satellite :0 ...）
+- Godot 4.7 官方构建自带 Wayland 显示驱动，无此依赖（X11 不可用时会自动回退 wayland）
+- Godot 3.6 经 XWayland 跑时 GLX 走 Intel Mesa 渲染（nouveau 加载失败自动回退 Intel），正常打开；代价是渲染走 Intel 核显而非 NVIDIA
+
 ## 2. 命令行入口
 
 ```bash
