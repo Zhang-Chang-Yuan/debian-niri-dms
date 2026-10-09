@@ -77,4 +77,33 @@ pkill fcitx5 && sleep 1 && fcitx5 -d &
 
 - 配合第 2 节 page_size=5，候选面板每页 5 个、单行横排，视觉冗余最小
 - 改字体可加 Font="Noto Sans 10"；恢复竖排删掉该文件即可
-- 启动器里的 fcitx5 系列条目（Fcitx 5、Fcitx 5 配置、迁移向导、输入法 im-config、键盘布局测试器）清理方法见 010-niri-dms.md §2.1
+- 启动器里的 DMS/niri 自身条目（设置、便签等）清理见 010-niri-dms.md 第 2 节
+
+## 6. 启动器条目清理
+
+fcitx5 家族在启动器（Mod+Space）会露出多个条目，只保留配置入口，其余用同名覆盖文件隐藏（不卸载，删掉覆盖文件即恢复）：
+
+- 保留「Fcitx 5 配置」（Exec=/usr/bin/fcitx5-configtool），输入法设置的唯一入口，不要覆盖它
+- org.fcitx.Fcitx5（启动输入法）：只是启动 fcitx5 守护进程的壳，niri 第 3 节已 spawn-at-startup 启动
+- org.fcitx.fcitx5-migrator（迁移向导）：一次性迁移工具
+- im-config（输入法）：Debian 输入法框架切换器，与本方案共存时容易误切
+- kbd-layout-viewer5（键盘布局测试器）：KDE 工具，非 fcitx5 日常入口
+
+```bash
+mkdir -p ~/.local/share/applications
+
+for f in org.fcitx.Fcitx5 org.fcitx.fcitx5-migrator im-config kbd-layout-viewer5; do
+  src="/usr/share/applications/$f.desktop"
+  dst="$HOME/.local/share/applications/$f.desktop"
+  cp "$src" "$dst"
+  sed -i '/^NoDisplay[[:space:]]*=/d' "$dst"
+  sed -i '/^\[Desktop Entry\]/a NoDisplay=true' "$dst"
+  desktop-file-validate "$dst"
+done
+
+update-desktop-database ~/.local/share/applications
+systemctl --user restart dms.service
+```
+
+- 系统文件本就 NoDisplay=true 的无需处理：fcitx5-wayland-launcher、org.fcitx.fcitx5-config-qt、org.fcitx.fcitx5-qt5/6-gui-wrapper
+- 要调输入法设置：启动器打开「Fcitx 5 配置」
