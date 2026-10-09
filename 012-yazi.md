@@ -2,7 +2,7 @@
 
 ## 1. 安装（二进制）
 
-从 GitHub release 下载官方二进制安装到 ~/.local/bin（见 017-bin.md），无需 sudo、无需 apt 源订阅。glibc 系统选 -gnu 压缩包（musl 为静态构建）：
+从 GitHub release 下载官方二进制安装到 ~/.local/bin（见 018-bin.md），无需 sudo、无需 apt 源订阅。glibc 系统选 -gnu 压缩包（musl 为静态构建）：
 
 ```bash
 mkdir -p ~/.local/bin
